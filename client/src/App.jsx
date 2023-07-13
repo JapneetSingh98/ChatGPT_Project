@@ -5,10 +5,26 @@ import sqlLogo from "./assets/sql-logo.png";
 
 function App() {
     const [queryDescription, setQueryDescription] = useState("");
+    const [sqlQuery, setSqlQuery] = useState("");
     
-    function onSubmit(e) {
+    async function onSubmit(e) {
         e.preventDefault();
-        console.log("form submitted", queryDescription);
+        const generatedQuery = await generateQuery();
+        
+        setSqlQuery(generatedQuery);
+    }
+    
+    async function generateQuery() {
+        const response = await fetch("http://localhost:3005/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({queryDescription: queryDescription})
+        });
+        
+        const data = await response.json();
+        return data.response.trim();
     }
     
     return (
@@ -25,6 +41,7 @@ function App() {
                 />
                 <input type="submit" value="Generate query"/>
             </form>
+            <pre>{sqlQuery}</pre>
         </main>
     );
 }
